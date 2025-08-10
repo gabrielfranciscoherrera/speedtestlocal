@@ -131,26 +131,29 @@ class SpeedTester {
         try {
             console.log('🔐 Intentando iniciar sesión...');
             
-            let clientIP = 'IP no disponible';
-            let ipError = null;
-            
+            let clientIP = null;
+
             try {
                 clientIP = await this.getClientIP();
                 console.log(`✅ IP del cliente obtenida: ${clientIP}`);
             } catch (ipError) {
                 console.warn('⚠️ Error obteniendo IP del cliente:', ipError);
-                clientIP = 'Error obteniendo IP';
             }
-            
+
+            const requestBody = {
+                action: 'iniciar_sesion'
+            };
+
+            if (clientIP) {
+                requestBody.client_ip = clientIP;
+            }
+
             const response = await fetch('api/speedtest.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    action: 'iniciar_sesion',
-                    client_ip: clientIP
-                })
+                body: JSON.stringify(requestBody)
             });
             
             if (response.ok) {
@@ -159,7 +162,8 @@ class SpeedTester {
                 if (data.success && data.token) {
                     this.currentSession = data;
                     console.log('✅ Sesión iniciada correctamente:', data);
-                    this.updateStatus(`Conectado como: ${data.cliente.nombre} (IP: ${clientIP})`);
+                    const ipMessage = clientIP ? ` (IP: ${clientIP})` : '';
+                    this.updateStatus(`Conectado como: ${data.cliente.nombre}${ipMessage}`);
                     
                     // Habilitar botones de test
                     this.enableButtons();
@@ -1498,8 +1502,24 @@ class SpeedTester {
                 }
             }
         }
-        
-        // Método 2: Intentar obtener IP desde la URL actual
+
+        // Método 2: Intentar obtener IP desde la API local
+        try {
+            console.log('🌐 Intentando obtener IP desde API local...');
+            const response = await fetch('api/speedtest.php?action=cliente_info', { cache: 'no-cache' });
+            const data = await response.json().catch(() => ({}));
+            if (data.ip) {
+                console.log(`✅ IP obtenida desde API local: ${data.ip}`);
+                return data.ip;
+            } else {
+                errors.push(`API local no proporcionó IP (status ${response.status})`);
+            }
+        } catch (error) {
+            errors.push(`API local error: ${error.message}`);
+            console.log('❌ Error en API local:', error.message);
+        }
+
+        // Método 3: Intentar obtener IP desde la URL actual
         try {
             const urlParts = window.location.href.split('/');
             if (urlParts[2] && urlParts[2].includes('.')) {
@@ -1513,8 +1533,8 @@ class SpeedTester {
             errors.push(`Error extrayendo IP de URL: ${error.message}`);
             console.log('❌ Error extrayendo IP de la URL:', error.message);
         }
-        
-        // Método 3: Intentar obtener IP desde el navegador
+
+        // Método 4: Intentar obtener IP desde el navegador
         try {
             if (navigator.connection && navigator.connection.effectiveType) {
                 console.log('📱 Información de conexión disponible:', navigator.connection);
@@ -1522,12 +1542,11 @@ class SpeedTester {
         } catch (error) {
             console.log('❌ No se pudo obtener información de conexión del navegador');
         }
-        
-        // Método 4: IP por defecto del servidor local
+
+        // Método 5: No se pudo obtener IP
         console.log('⚠️ No se pudo obtener IP externa, usando IP local por defecto');
         console.log('🔍 Errores encontrados:', errors);
-        
-        // Lanzar error con información detallada
+
         const errorMessage = `No se pudo obtener IP del cliente. Errores: ${errors.join('; ')}`;
         const detailedError = new Error(errorMessage);
         detailedError.details = {
@@ -1536,7 +1555,7 @@ class SpeedTester {
             userAgent: navigator.userAgent,
             online: navigator.onLine
         };
-        
+
         throw detailedError;
     }
 
