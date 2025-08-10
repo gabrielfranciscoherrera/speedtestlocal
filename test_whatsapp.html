@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test WhatsApp</title>
+</head>
+<body>
+    <h1>Test de Función WhatsApp</h1>
+    <button onclick="testWhatsApp()">📱 Probar WhatsApp</button>
+    
+    <script>
+        function testWhatsApp() {
+            try {
+                const deviceInfo = {
+                    platform: navigator.platform || 'Plataforma desconocida',
+                    url: window.location.href,
+                    timestamp: new Date().toLocaleString('es-ES'),
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    onLine: navigator.onLine,
+                    cookieEnabled: navigator.cookieEnabled
+                };
+                
+                // IP simulada
+                const clientIP = '10.0.0.200';
+                
+                const message = [
+                    '🚨 REPORTE DE PROBLEMA DE CONECTIVIDAD',
+                    '',
+                    '🔍 IP Cliente: ' + clientIP,
+                    '📱 Dispositivo: ' + deviceInfo.platform,
+                    '🌐 URL: ' + deviceInfo.url,
+                    '⏰ Fecha: ' + deviceInfo.timestamp,
+                    '🌍 Zona horaria: ' + deviceInfo.timezone,
+                    '📶 Estado navegador: ' + (deviceInfo.onLine ? 'Online' : 'Offline'),
+                    '🍪 Cookies: ' + (deviceInfo.cookieEnabled ? 'Habilitadas' : 'Deshabilitadas'),
+                    '',
+                    '❌ Estado: Sin conexión a internet',
+                    '',
+                    'Por favor, contactar al cliente para resolver el problema de conectividad.'
+                ].join('\n');
+                
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/18099928820?text=${encodedMessage}`;
+                
+                console.log('URL de WhatsApp:', whatsappUrl);
+                console.log('Mensaje:', message);
+                
+                const newWindow = window.open(whatsappUrl, '_blank');
+                
+                if (newWindow) {
+                    alert('WhatsApp abierto en nueva pestaña');
+                } else {
+                    alert('No se pudo abrir WhatsApp. Bloqueador de popups activado?');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

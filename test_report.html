@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Reporte WhatsApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+            color: white;
+            border: 3px solid #FFEB3B;
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
+        }
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(244, 67, 54, 0.7);
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Función Reporte WhatsApp</h1>
+        <p>Esta página prueba la función de reporte a WhatsApp de forma aislada.</p>
+        
+        <button class="btn btn-warning" onclick="testSendReport()">📱 Test Reportar Problema</button>
+        
+        <h3>📋 Log de Actividad:</h3>
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function testSendReport() {
+            log('🚀 Iniciando test de función sendReport...');
+            
+            try {
+                // Información del dispositivo y navegador
+                const deviceInfo = {
+                    userAgent: navigator.userAgent || 'Navegador desconocido',
+                    platform: navigator.platform || 'Plataforma desconocida',
+                    language: navigator.language || 'Idioma desconocido',
+                    cookieEnabled: navigator.cookieEnabled,
+                    onLine: navigator.onLine,
+                    url: window.location.href,
+                    timestamp: new Date().toLocaleString('es-ES'),
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+                
+                log('📱 Información del dispositivo obtenida');
+                log(`   User Agent: ${deviceInfo.userAgent}`);
+                log(`   Plataforma: ${deviceInfo.platform}`);
+                log(`   Online: ${deviceInfo.onLine}`);
+                
+                // Crear mensaje detallado
+                const message = [
+                    '🚨 REPORTE DE PROBLEMA DE CONECTIVIDAD (TEST)',
+                    '',
+                    '🔍 Cliente: ' + deviceInfo.userAgent,
+                    '📱 Dispositivo: ' + deviceInfo.platform,
+                    '🌐 URL: ' + deviceInfo.url,
+                    '⏰ Fecha: ' + deviceInfo.timestamp,
+                    '🌍 Zona horaria: ' + deviceInfo.timezone,
+                    '📶 Estado navegador: ' + (deviceInfo.onLine ? 'Online' : 'Offline'),
+                    '🍪 Cookies: ' + (deviceInfo.cookieEnabled ? 'Habilitadas' : 'Deshabilitadas'),
+                    '',
+                    '❌ Estado: Sin conexión a internet (TEST)',
+                    '',
+                    'Este es un TEST de la función de reporte.'
+                ].join('\n');
+                
+                log('📝 Mensaje creado correctamente');
+                
+                // Codificar mensaje para URL
+                const encodedMessage = encodeURIComponent(message);
+                
+                // Crear URL de WhatsApp
+                const whatsappUrl = `https://wa.me/18099928820?text=${encodedMessage}`;
+                
+                log('🔗 URL de WhatsApp generada');
+                log(`   URL: ${whatsappUrl}`);
+                
+                // Abrir WhatsApp en nueva pestaña
+                log('🌐 Intentando abrir WhatsApp...');
+                const newWindow = window.open(whatsappUrl, '_blank');
+                
+                if (newWindow) {
+                    log('✅ Ventana de WhatsApp abierta correctamente');
+                    
+                    // Verificar si se abrió correctamente
+                    setTimeout(() => {
+                        if (newWindow.closed) {
+                            log('⚠️ Ventana de WhatsApp se cerró');
+                        } else {
+                            log('✅ Ventana de WhatsApp sigue abierta');
+                        }
+                    }, 2000);
+                } else {
+                    log('❌ No se pudo abrir ventana de WhatsApp');
+                    log('💡 Posible bloqueo del navegador');
+                }
+                
+                log('✅ Test de reporte completado');
+                
+            } catch (error) {
+                log('❌ Error en test de reporte: ' + error.message);
+                console.error('Error completo:', error);
+            }
+        }
+
+        // Log inicial
+        log('📱 Página de test cargada');
+        log('🌐 Estado de conexión: ' + (navigator.onLine ? 'Online' : 'Offline'));
+        log('🔍 Navegador: ' + navigator.userAgent);
+    </script>
+</body>
+</html>
