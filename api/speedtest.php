@@ -186,10 +186,10 @@ try {
                 case 'cliente_info':
                     $cliente = $db->getClienteByIP($ipCliente);
                     if ($cliente) {
-                        echo json_encode(['success' => true, 'cliente' => $cliente]);
+                        echo json_encode(['success' => true, 'cliente' => $cliente, 'ip' => $ipCliente]);
                     } else {
                         http_response_code(404);
-                        echo json_encode(['error' => 'Cliente no encontrado']);
+                        echo json_encode(['error' => 'Cliente no encontrado', 'ip' => $ipCliente]);
                     }
                     break;
                     
